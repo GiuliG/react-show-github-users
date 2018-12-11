@@ -1,25 +1,48 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import Userform from './components/Userform'
 import './App.css';
+import axios from 'axios';
+
+
 
 class App extends Component {
+  state ={
+    users: [],
+    isLoading: true,
+  }
+
+  
+  getUser = (e) =>{
+  e.preventDefault();
+  const user = e.target.elements.username.value;
+  axios.get(`https://api.github.com/search/users?q=${user}+in:login`)
+    .then((res) => {
+        const repos = res.data.items;
+        console.log(repos);
+        this.setState ({
+        repos
+        })
+    })
+  .catch((error)=>{
+    console.log(error)
+      });
+}
+
+
+
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <Userform getUser = {this.getUser}/>
+                {this.stateisLoading ? <div> Loading</div> : this.state.repos.map((users)=>{
+                        return (
+                          <div key={users.login}>
+                          <ul>
+                            <li>{users.login}</li>
+                          </ul>
+                          </div>
+                          )
+                    })}
       </div>
     );
   }
